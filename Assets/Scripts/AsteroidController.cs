@@ -1,53 +1,49 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class AsteroidController : MonoBehaviour
 {
-    [SerializeField] private float speed = 3;
+    [SerializeField] private float minSpeed = 3;
+    [SerializeField] private float maxSpeed = 6;
+    [SerializeField] float fixedSpeed;
+    private float currentSpeed;
     public static int AsteroidCount;
+    public static event EventHandler ReturnAndSpawnOther;
+    public static event EventHandler ReturnWithoutSpawn;
 
     // Start is called before the first frame update
     void Start()
     {
-        AsteroidCount++;
+        currentSpeed = fixedSpeed <= 0 ? Random.Range(minSpeed, maxSpeed) : fixedSpeed;
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(Vector3.up * Time.deltaTime * speed);
+        transform.Translate(Vector3.up * Time.deltaTime * currentSpeed);
+        //CheckOutOfBounds();
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Bullet"))
+        if (Constants.AsteroidTags.ContainsValue(other.tag))
         {
-            AsteroidCount--;
-            Destroy(other.gameObject);
+            return;
         }
-        else
+        if (other.CompareTag(Constants.Player) || other.CompareTag(Constants.UFO))
         {
-            Destroy(other.gameObject);
+            ReturnWithoutSpawn?.Invoke(this.gameObject, EventArgs.Empty);
+            return;
         }
-
-        if (!gameObject.CompareTag("Small Asteroid"))
-        {
-            SpawnAsteroids(gameObject.tag);
-        }
-
-        Destroy(gameObject);
+        ReturnAndSpawnOther?.Invoke(this.gameObject, EventArgs.Empty);
     }
 
-    private void SpawnAsteroids(string current)
-    {
-        for (var i = 0; i < 2; i++)
-        {
-            var spawnPos = transform.position;
-            var zRotation = i == 0 ? transform.eulerAngles.z + 45 : transform.eulerAngles.z - 45;
-            var rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, zRotation);
-            var clone = Instantiate(gameObject, spawnPos, rotation);
-            clone.tag = current == "Big Asteroid" ? "Asteroid" : "Small Asteroid";
-            var scale = current == "Big Asteroid" ? 1.5f : 1.0f;
-            clone.transform.localScale = new Vector3(scale, scale, scale); ;
-        }
-    }
+    //private void CheckOutOfBounds()
+    //{
+    //    if (Constants.CheckOutOfBounds(transform.position))
+    //    {
+    //        ReturnWithoutSpawn?.Invoke(this.gameObject, EventArgs.Empty);
+    //    }
+    //}
 }

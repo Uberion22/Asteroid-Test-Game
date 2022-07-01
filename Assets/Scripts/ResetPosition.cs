@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class ResetPosition : MonoBehaviour
 {
-    [SerializeField] private float xBound;
-
-    [SerializeField] private float yBound;
     // Start is called before the first frame update
     void Start()
     {
@@ -17,15 +14,20 @@ public class ResetPosition : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Math.Abs(transform.position.x) > xBound)
+        CheckPosition();
+    }
+
+    private void CheckPosition()
+    {
+        if (Math.Abs(transform.position.x) > Constants.CornerX)
         {
-            transform.position = (new Vector3(- xBound * Math.Sign(transform.position.x), transform.position.y,
+            transform.position = (new Vector3(-Constants.CornerX * Math.Sign(transform.position.x), transform.position.y,
                 transform.position.z));
         }
 
-        if (Math.Abs(transform.position.y) > yBound)
+        if (Math.Abs(transform.position.y) > Constants.CornerY)
         {
-            transform.position = (new Vector3(transform.position.x, - yBound * Math.Sign(transform.position.y),
+            transform.position = (new Vector3(transform.position.x, -Constants.CornerY * Math.Sign(transform.position.y),
                 transform.position.z));
         }
     }

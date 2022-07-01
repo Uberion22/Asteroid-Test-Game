@@ -13,11 +13,11 @@ GameObject:
   - component: {fileID: 4946958396658584121}
   - component: {fileID: 4946958396658584070}
   - component: {fileID: 4946958396658584122}
-  - component: {fileID: 7239258757253083263}
   - component: {fileID: 8211325800299148668}
+  - component: {fileID: 6674726386372055842}
   m_Layer: 0
   m_Name: 'Asteroid '
-  m_TagString: Asteroid
+  m_TagString: Big Asteroid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a367754d5ea789849aab9a1fd6d8d31f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -95,7 +95,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4946958396658584071}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
@@ -112,23 +112,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 580ade838bc033d4e870dc9364e98e8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
---- !u!114 &7239258757253083263
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4946958396658584071}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 702c2effdf7f8684b9ce080a4e9fbe70, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  topBound: 7
-  lowerBound: -7
-  leftBound: -16
-  rightBound: 16
+  minSpeed: 3
+  maxSpeed: 6
+  fixedSpeed: 0
 --- !u!54 &8211325800299148668
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -145,3 +131,15 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &6674726386372055842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4946958396658584071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c058c21426de1ef488d03a894bf9b698, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

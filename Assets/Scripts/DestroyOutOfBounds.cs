@@ -26,8 +26,11 @@ public class DestroyOutOfBounds : MonoBehaviour
                 AsteroidController.AsteroidCount--;
                 //PlayerController.playerLives--;
                 // Debug.Log($"Player Lives: {PlayerController.playerLives}");
+                Destroy(gameObject);
+                return;
             }
-            Destroy(gameObject);
+            PlayerController._pool.Release(gameObject);
+            //gameObject.SetActive(false);
 
             //if (PlayerController.playerLives <= 0)
             //{

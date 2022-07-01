@@ -4,10 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Asteroid
-  - Bullet
   - Big Asteroid
   - Small Asteroid
+  - UFO
+  - Medium Asteroid
+  - Player Bullet
+  - UFO Bullet
   layers:
   - Default
   - TransparentFX
