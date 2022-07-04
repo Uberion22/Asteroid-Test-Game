@@ -754,7 +754,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Controls: \nkeyboard + mouse"
+  m_text: "Controls: \nkeyboard"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1408,11 +1408,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bf3593b74e79aa469fe85ac5115c1c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: -200
+  rotationSpeed: 100
   maxSpeed: 2
+  acceleration: 0.02
+  frictionForce: 0.003
   bullet: {fileID: 5578940277461347107, guid: 7748a48a156f4574f985154d27add1da, type: 3}
-  shuttingSpeed: 3
-  PlayerLives: 3
+  shutPerSecond: 3
 --- !u!114 &1245049874
 MonoBehaviour:
   m_ObjectHideFlags: 0

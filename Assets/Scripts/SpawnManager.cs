@@ -122,7 +122,6 @@ public class SpawnManager : MonoBehaviour
             {
                 spawnPosX = - Constants.SpawnBoundX;
                 spawnPosY = Random.Range(-(Constants.CornerY - borderShiftY), Constants.CornerY - borderShiftY);
-                var compincator = Math.Abs(spawnPosY * (90 / Constants.SpawnBoundY));
                 zRot = Random.Range(-180, 0);
                 break;
             }
@@ -130,7 +129,6 @@ public class SpawnManager : MonoBehaviour
             {
                 spawnPosX = Constants.SpawnBoundX;
                 spawnPosY = Random.Range(-(Constants.CornerY - borderShiftY), Constants.CornerY - borderShiftY);
-                var compincator = spawnPosY * (90 / Constants.SpawnBoundY);
                 zRot = Random.Range(0, 180);
                 break;
             }

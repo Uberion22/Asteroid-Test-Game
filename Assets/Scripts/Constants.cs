@@ -5,12 +5,10 @@ using UnityEngine;
 
 public class Constants
 {
-    public const float DestroyBoundX = 28;
-    public const float DestroyBoundY = 19;
-    public const float SpawnBoundX = 27;
-    public const float SpawnBoundY = 18;
+    public const float SpawnBoundX = 26.5f;
+    public const float SpawnBoundY = 16.5f;
     public const float CornerX = 26.5f;
-    public const float CornerY = 17;
+    public const float CornerY = 16;
     public const string SmallAsteroidTag = "Small Asteroid";
     public const string MediumAsteroidTag = "Medium Asteroid";
     public const string BigAsteroidTag = "Big Asteroid";
@@ -44,11 +42,6 @@ public class Constants
         {BigAsteroidTag, BigAsteroidPoints},
         {UFOTag, UFOPoints}
     };
-
-    public static bool CheckOutOfBounds(Vector3 position)
-    {
-        return Math.Abs(position.y) > DestroyBoundY || Math.Abs(position.x) > DestroyBoundX;
-    }
 }
 
 public enum AsteroidSize

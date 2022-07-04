@@ -1,10 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
-using UnityEngine.UI;
-using Debug = UnityEngine.Debug;
 
 public class PlayerBullet : MonoBehaviour
 { 
@@ -34,7 +30,6 @@ public class PlayerBullet : MonoBehaviour
     {
         if (other.CompareTag(Constants.PlayerTag)) return;
 
-        Debug.Log("Trigger---------------");
         GetScorePoint?.Invoke(other.tag, EventArgs.Empty);
         ReturnToPool?.Invoke(this.gameObject, EventArgs.Empty);
     }
@@ -42,7 +37,6 @@ public class PlayerBullet : MonoBehaviour
     private IEnumerator WaitBeforeDestroy(float time)
     {
         yield return new WaitForSeconds(time);
-        Debug.Log($"Destroyed {gameObject.tag}");
         ReturnToPool?.Invoke(this.gameObject, EventArgs.Empty);
     }
 

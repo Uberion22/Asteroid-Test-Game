@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using Random = UnityEngine.Random;
@@ -23,10 +22,6 @@ public class UFOController : MonoBehaviour
         StartCoroutine(NextShot());
     }
 
-    void OnEnable()
-    {
-
-    }
 
     void OnDestroy()
     {
@@ -42,17 +37,14 @@ public class UFOController : MonoBehaviour
     void Update()
     {
         transform.Translate(Vector3.up * Time.deltaTime * speed);
-        //CheckOutOfBounds();
     }
 
     private void ShotToPlayer()
     {
         var rotation = Quaternion.Euler(redBullet.transform.rotation.eulerAngles.x, redBullet.transform.rotation.eulerAngles.y, Mathf.Atan2(playerTransform.position.y - transform.position.y, playerTransform.position.x - transform.position.x) * Mathf.Rad2Deg - 90);
         var bulletClone = UFOBulletPool.Get();
-        bulletClone.transform.position = transform.position; //Instantiate(redBullet, transform.position, rotation);
+        bulletClone.transform.position = transform.position;
         bulletClone.transform.rotation = rotation;
-        // bulletClone.GetComponent<Material>().color = Color.red;
-        //bulletClone.transform.rotation = Quaternion.Euler(bulletClone.transform.rotation.eulerAngles.x, bulletClone.transform.rotation.eulerAngles.y, Mathf.Atan2(playerTransform.position.y - bulletClone.transform.position.y, playerTransform.position.x - bulletClone.transform.position.x) * Mathf.Rad2Deg - 90);
     }
 
     private IEnumerator NextShot()
@@ -82,15 +74,6 @@ public class UFOController : MonoBehaviour
 
         OutOfBounds?.Invoke(this.gameObject, EventArgs.Empty);
     }
-
-    //private void CheckOutOfBounds()
-    //{
-    //    if (Constants.CheckOutOfBounds(transform.position))
-    //    {
-    //        OutOfBounds?.Invoke(this.gameObject, EventArgs.Empty);
-    //    }
-    //}
-
     private void ReturnToBulletPool(object sender, EventArgs e)
     {
         var ufoBullet = (GameObject)sender;

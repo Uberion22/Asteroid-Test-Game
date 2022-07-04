@@ -1,22 +1,17 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.Impl;
-using UnityEngine.UI;
 
 public class InterfaceManager : MonoBehaviour
 {
-    private float currentTimeScale;
     [SerializeField] GameObject buttons;
     [SerializeField] GameObject continueBtn;
     [SerializeField] TMP_Text scoreText;
     [SerializeField] TMP_Text livesText;
     [SerializeField] private TMP_Text settingsButtonText;
-    
-    private bool isMouseUsed;
+    private float currentTimeScale;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +20,7 @@ public class InterfaceManager : MonoBehaviour
         currentTimeScale = Time.timeScale;
         Time.timeScale = 0;
         ShowButtons(GameManager.IsNewGame);
+        SetSettingsButtonText();
     }
 
     // Update is called once per frame
@@ -47,7 +43,6 @@ public class InterfaceManager : MonoBehaviour
         if (!GameManager.IsNewGame)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            Debug.Log("Reset");
         }
         ShowButtons(false);
         GameManager.IsNewGame = false;
@@ -68,8 +63,8 @@ public class InterfaceManager : MonoBehaviour
 
     public void OnSettingsPress()
     {
-        isMouseUsed = !isMouseUsed;
-        settingsButtonText.text = isMouseUsed ? "Controls:\nkeyboard + mouse" : "Controls:\nkeyboard";
+        GameManager.KeyboardOnly = !GameManager.KeyboardOnly;
+        SetSettingsButtonText();
     }
 
     private void UpdateScorePoints(object currentScore, EventArgs e)
@@ -85,7 +80,11 @@ public class InterfaceManager : MonoBehaviour
             continueBtn.SetActive(false);
         }
 
-        Debug.Log("Dameget");
         livesText.text = $"Lives: {currentLives}";
+    }
+
+    private void SetSettingsButtonText()
+    {
+        settingsButtonText.text = GameManager.KeyboardOnly ? "Controls:\nkeyboard" : "Controls:\nkeyboard + mouse";
     }
 }
