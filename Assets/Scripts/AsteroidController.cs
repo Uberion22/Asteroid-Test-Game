@@ -25,18 +25,30 @@ public class AsteroidController : MonoBehaviour
         //CheckOutOfBounds();
     }
 
+    void OnDestroy()
+    {
+        ResetStaticOnDestroy();
+    }
+
     void OnTriggerEnter(Collider other)
     {
         if (Constants.AsteroidTags.ContainsValue(other.tag))
         {
             return;
         }
-        if (other.CompareTag(Constants.Player) || other.CompareTag(Constants.UFO))
+        if (other.CompareTag(Constants.PlayerTag) || other.CompareTag(Constants.UFOTag))
         {
             ReturnWithoutSpawn?.Invoke(this.gameObject, EventArgs.Empty);
             return;
         }
         ReturnAndSpawnOther?.Invoke(this.gameObject, EventArgs.Empty);
+    }
+
+    private void ResetStaticOnDestroy()
+    {
+        AsteroidCount = 0;
+        ReturnAndSpawnOther = null;
+        ReturnWithoutSpawn = null;
     }
 
     //private void CheckOutOfBounds()

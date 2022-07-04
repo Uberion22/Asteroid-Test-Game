@@ -20,11 +20,17 @@ public class UFOController : MonoBehaviour
         UFOBullet.ReturnWithoutSpawn += ReturnToBulletPool;
         SetBulletPool();
         playerTransform = GameObject.Find("Player").transform;
+        StartCoroutine(NextShot());
     }
 
     void OnEnable()
     {
-        StartCoroutine(NextShot());
+
+    }
+
+    void OnDestroy()
+    {
+        ResetStaticOnDestroy();
     }
 
     void OnDisable()
@@ -72,7 +78,7 @@ public class UFOController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(Constants.UFOBullet)) return;
+        if (other.CompareTag(Constants.UFOBulletTag)) return;
 
         OutOfBounds?.Invoke(this.gameObject, EventArgs.Empty);
     }
@@ -89,5 +95,11 @@ public class UFOController : MonoBehaviour
     {
         var ufoBullet = (GameObject)sender;
         UFOBulletPool.Release(ufoBullet);
+    }
+
+    private void ResetStaticOnDestroy()
+    {
+        UFOBulletPool = null;
+        OutOfBounds = null;
     }
 }

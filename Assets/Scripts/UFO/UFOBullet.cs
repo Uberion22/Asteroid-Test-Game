@@ -17,9 +17,14 @@ public class UFOBullet : MonoBehaviour
         //CheckOutOfBounds();
     }
 
+    void OnDestroy()
+    { 
+        ReturnWithoutSpawn = null;
+    }
+
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag(Constants.UFO)) return;
+        if (other.CompareTag(Constants.UFOTag)) return;
 
         ReturnWithoutSpawn?.Invoke(this.gameObject, EventArgs.Empty);
     }

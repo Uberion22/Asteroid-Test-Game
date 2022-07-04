@@ -14,10 +14,14 @@ public class Constants
     public const string SmallAsteroidTag = "Small Asteroid";
     public const string MediumAsteroidTag = "Medium Asteroid";
     public const string BigAsteroidTag = "Big Asteroid";
-    public const string PlayerBullet = "Player Bullet";
-    public const string UFOBullet = "UFO Bullet";
-    public const string UFO = "UFO";
-    public const string Player = "Player";
+    public const string PlayerBulletTag = "Player Bullet";
+    public const string UFOBulletTag = "UFO Bullet";
+    public const string UFOTag = "UFO";
+    public const string PlayerTag = "Player";
+    public const int SmallAsteroidPoints = 100;
+    public const int MediumAsteroidPoints = 50;
+    public const int BigAsteroidPoints = 20;
+    public const int UFOPoints = 200;
 
     public static Dictionary<AsteroidSize, string> AsteroidTags = new FlexibleDictionary<AsteroidSize, string>()
     {
@@ -31,6 +35,14 @@ public class Constants
         {AsteroidSize.SmallAsteroid, new Vector3(1,1,1) },
         {AsteroidSize.MediumAsteroid, new Vector3(1.5f,1.5f,1.5f)},
         {AsteroidSize.BigAsteroid, new Vector3(2f,2f,2f) }
+    };
+
+    public static Dictionary<string, int> DestroyScorePoints = new Dictionary<string, int>()
+    {
+        {SmallAsteroidTag, SmallAsteroidPoints},
+        {MediumAsteroidTag, MediumAsteroidPoints},
+        {BigAsteroidTag, BigAsteroidPoints},
+        {UFOTag, UFOPoints}
     };
 
     public static bool CheckOutOfBounds(Vector3 position)

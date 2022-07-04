@@ -32,9 +32,18 @@ public class SpawnManager : MonoBehaviour
         AsteroidController.ReturnAndSpawnOther += SpawnAsteroidsAfterDestroy;
         AsteroidController.ReturnWithoutSpawn += ReturnAsteroidToPool;
         UFOController.OutOfBounds += ReturnUFOToPool;
-        StartCoroutine(WaitAndSpawnWave(spawnTime,AsteroidSize.BigAsteroid));
+        StartCoroutine(WaitAndSpawnWave(spawnTime, AsteroidSize.BigAsteroid));
         StartCoroutine(StartSpawningUFO());
         //InvokeRepeating("SpawnUFO", startDelay, repeatRate);
+    }
+
+    void OnEnable()
+    {
+    }
+
+    void OnDestroy()
+    {
+        ResetStaticOnDestroy();
     }
 
     // Update is called once per frame
@@ -233,5 +242,11 @@ public class SpawnManager : MonoBehaviour
         {
             StartCoroutine(WaitAndSpawnWave(spawnTime,null));
         }
+    }
+
+    private void ResetStaticOnDestroy()
+    {
+        AsteroidPool = null;
+        UFOPool = null;
     }
 }

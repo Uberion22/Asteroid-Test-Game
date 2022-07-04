@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -10,12 +11,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float maxSpeed = 3;
     [SerializeField] private GameObject bullet;
     [SerializeField] private float shuttingSpeed = 3;
-    [SerializeField] private int PlayerLives = 3;
     public static ObjectPool<GameObject> PlayerBulletPool;
+    public static event EventHandler PlayerDamaged;
 
     private float speed = 0;
 
-    private float acceleration = 0.002f;
+    private float acceleration = 0.02f;
     private float frictionForce = 0.003f;
     private float bulletSpeed = 0;
     private float timeAfterShot;
@@ -23,7 +24,8 @@ public class PlayerController : MonoBehaviour
     private float flickerSpeed = 0.5f;
     private Transform child;
     private bool invulnerability;
-
+    private Vector3 directionVector;
+    private Vector3 lastPosition;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,7 +34,7 @@ public class PlayerController : MonoBehaviour
         PlayerBulletPool = new ObjectPool<GameObject>(createFunc: () =>
             {
                 var temp = Instantiate(bullet);
-                //temp.transform.parent = gameObject.transform;
+
                 return temp;
             },
             actionOnGet: (obj) =>  obj.SetActive(true),
@@ -51,14 +53,17 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKey(KeyCode.W))
         {
            speed = speed >= maxSpeed ? speed : speed + acceleration;
+
+           directionVector = Vector3.up - transform.up;
+           
         }
         else
         {
-            speed = speed <= 0 ? 0 : speed- frictionForce;
+            speed = speed <= 0 ? 0 : speed - frictionForce;
         }
 
         //CheckPosition();
-        transform.Translate(Vector3.up * Time.deltaTime * speed);
+        transform.Translate(directionVector * Time.deltaTime * speed);
 
         var horizontalAxes = Input.GetAxis("Horizontal");
 
@@ -73,20 +78,24 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void HitPlayer(object sender, EventArgs e)
+    void OnDestroy()
     {
-        var asteroid = (GameObject)sender;
-        SpawnManager.AsteroidPool.Release(asteroid);
-        PlayerLives--;
-        Debug.Log($"Player Lives: {PlayerLives}");
+        PlayerBulletPool = null;
+        PlayerDamaged = null;
     }
+
+    //private void HitPlayer(object sender, EventArgs e)
+    //{
+    //    var asteroid = (GameObject)sender;
+    //    SpawnManager.AsteroidPool.Release(asteroid);
+    //}
 
     void OnTriggerEnter(Collider other)
     {
-        if(invulnerability || other.CompareTag(Constants.PlayerBullet)) return;
+        if(invulnerability || other.CompareTag(Constants.PlayerBulletTag)) return;
 
+        PlayerDamaged?.Invoke(null, EventArgs.Empty);
         StartCoroutine(EnableFlicker());
-        PlayerLives--;
     }
 
     private void ReturnToBulletPool(object sender, EventArgs e)
@@ -117,22 +126,7 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForSeconds(flickerSpeed);
         }
         child.gameObject.SetActive(true);
-        Debug.Log("End");
+       // Debug.Log("End");
         invulnerability = false;
     }
-
-    //private void CheckPosition()
-    //{
-    //    if (Math.Abs(transform.position.x) > Constants.CornerX)
-    //    {
-    //        transform.position = (new Vector3(-Constants.CornerX * Math.Sign(transform.position.x), transform.position.y,
-    //            transform.position.z));
-    //    }
-
-    //    if (Math.Abs(transform.position.y) > Constants.CornerY)
-    //    {
-    //        transform.position = (new Vector3(transform.position.x, -Constants.CornerY * Math.Sign(transform.position.y),
-    //            transform.position.z));
-    //    }
-    //}
 }
