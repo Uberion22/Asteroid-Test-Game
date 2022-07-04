@@ -9,28 +9,26 @@ public class UFOController : MonoBehaviour
     [SerializeField] private float speed = 1;
     [SerializeField] private GameObject redBullet;
     public static ObjectPool<GameObject> UFOBulletPool;
-    public static event EventHandler OutOfBounds;
+    public static event Action<GameObject> OutOfBounds;
     private Transform playerTransform;
     
-
     // Start is called before the first frame update
     void Start()
     {
-        UFOBullet.ReturnWithoutSpawn += ReturnToBulletPool;
         SetBulletPool();
         playerTransform = GameObject.Find("Player").transform;
+        UFOBullet.ReturnToUFOBulletPool += ReturnToBulletPool;
+    }
+
+    void OnEnable()
+    {
         StartCoroutine(NextShot());
     }
 
-
     void OnDestroy()
     {
-        ResetStaticOnDestroy();
-    }
-
-    void OnDisable()
-    {
         StopAllCoroutines();
+        UFOBullet.ReturnToUFOBulletPool -= ReturnToBulletPool;
     }
 
     // Update is called once per frame
@@ -72,17 +70,10 @@ public class UFOController : MonoBehaviour
     {
         if (other.CompareTag(Constants.UFOBulletTag)) return;
 
-        OutOfBounds?.Invoke(this.gameObject, EventArgs.Empty);
+        OutOfBounds?.Invoke(this.gameObject);
     }
-    private void ReturnToBulletPool(object sender, EventArgs e)
+    private void ReturnToBulletPool(GameObject ufoBullet)
     {
-        var ufoBullet = (GameObject)sender;
         UFOBulletPool.Release(ufoBullet);
-    }
-
-    private void ResetStaticOnDestroy()
-    {
-        UFOBulletPool = null;
-        OutOfBounds = null;
     }
 }

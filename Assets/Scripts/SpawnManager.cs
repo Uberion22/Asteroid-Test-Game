@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
 using Random = UnityEngine.Random;
@@ -12,33 +10,35 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] GameObject UFOPrefab;
     [SerializeField] float UFOMinSpawnDelay = 5;
     [SerializeField] float UFOMaxSpawnDelay = 10;
+    [SerializeField] float nextWaveSpawnTime = 2;
+    [SerializeField] int enemysInWave = 2;
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip[] asteroidAudioClips;
     public static ObjectPool<GameObject> AsteroidPool;
     public static ObjectPool<GameObject> UFOPool;
-
-    private int currentWave;
-
-    private float spawnTime = 2;
-
-    private float currentTime = 0;
-    private float startDelay = 2;
-    private float repeatRate = 6;
-    private float zRot = 0;
+    private int spawnBoundShift = 20;
 
     // Start is called before the first frame update
     void Start()
     {
         SetAsteroidPoolSettings();
         SetUFOPoolSettings();
-        AsteroidController.ReturnAndSpawnOther += SpawnAsteroidsAfterDestroy;
-        AsteroidController.ReturnWithoutSpawn += ReturnAsteroidToPool;
-        UFOController.OutOfBounds += ReturnUFOToPool;
-        StartCoroutine(WaitAndSpawnWave(spawnTime, AsteroidSize.BigAsteroid));
+        StartCoroutine(WaitAndSpawnWave(nextWaveSpawnTime, AsteroidSize.BigAsteroid));
         StartCoroutine(StartSpawningUFO());
-        //InvokeRepeating("SpawnUFO", startDelay, repeatRate);
     }
 
     void OnEnable()
     {
+        AsteroidController.ReturnAndSpawnOther += SpawnAsteroidsAfterDestroy;
+        AsteroidController.ReturnWithoutSpawn += ReturnAsteroidToPool;
+        UFOController.OutOfBounds += ReturnUFOToPool;
+    }
+
+    void OnDisable()
+    {
+        AsteroidController.ReturnAndSpawnOther -= SpawnAsteroidsAfterDestroy;
+        AsteroidController.ReturnWithoutSpawn -= ReturnAsteroidToPool;
+        UFOController.OutOfBounds -= ReturnUFOToPool;
     }
 
     void OnDestroy()
@@ -46,18 +46,12 @@ public class SpawnManager : MonoBehaviour
         ResetStaticOnDestroy();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //SpawnNewWave(AsteroidController.AsteroidCount <= 0, null);
-        //SpawnUFO();
-    }
-
     private void SetAsteroidPositionAndRotation(GameObject asteroid)
     {
         var spawnSide = (SpawnSide)Random.Range(0, 4);
         var spawnPos = GetSpawnPos(spawnSide);
-        asteroid.transform.rotation = Quaternion.Euler(asteroidPrefab.transform.rotation.x, asteroidPrefab.transform.rotation.y, zRot);
+        var zRotation = Random.Range(0, 360);
+        asteroid.transform.rotation = Quaternion.Euler(asteroidPrefab.transform.rotation.x, asteroidPrefab.transform.rotation.y, zRotation);
         asteroid.transform.position = spawnPos;
     }
 
@@ -70,16 +64,15 @@ public class SpawnManager : MonoBehaviour
 
     private void SpawnNewWave(AsteroidSize? asteroidSize)
     {
-        for (int i = 0; i < currentWave + 2; i++)
+        for (int i = 0; i < enemysInWave; i++)
         {
             var asteroid = AsteroidPool.Get();
             SetAsteroidPositionAndRotation(asteroid);
             SetScaleAndTag(asteroid, asteroidSize);
         }
 
-        currentWave++;
+        enemysInWave++;
     }
-
 
     private void SpawnUFO()
     {
@@ -87,12 +80,11 @@ public class SpawnManager : MonoBehaviour
 
         var ufo = UFOPool.Get();
         var spawnSide = (SpawnSide)Random.Range(2, 4);
-        var spawnPos = GetSpawnPos(spawnSide,20);
-        var rotation = GetRotation(UFOPrefab.transform, spawnPos, -Math.Sign(spawnPos.x) * Constants.CornerX, -Math.Sign(spawnPos.y) * Constants.CornerY);//Quaternion.Euler(UFOPrefab.transform.rotation.x, UFOPrefab.transform.rotation.y, zRotation);
+        var spawnPos = GetSpawnPos(spawnSide, spawnBoundShift);
+        var rotation = GetRotation(UFOPrefab.transform, spawnPos, -Math.Sign(spawnPos.x) * Constants.CornerX, -Math.Sign(spawnPos.y) * Constants.CornerY);
         ufo.transform.position = spawnPos;
         ufo.transform.rotation = rotation;
     }
-
 
     private Vector3 GetSpawnPos(SpawnSide spawnSide, int boundShift = 0)
     {
@@ -106,30 +98,24 @@ public class SpawnManager : MonoBehaviour
             {
                 spawnPosX = Random.Range(-(Constants.CornerX), Constants.CornerX);
                 spawnPosY = Constants.SpawnBoundY;
-                zRot = Random.Range(90, 270);
                 break;
-
             }
             case SpawnSide.Down:
             {
                 spawnPosX = Random.Range(-(Constants.CornerX), Constants.CornerX);
                 spawnPosY = -Constants.SpawnBoundY;
-                zRot = Random.Range(-90, 90);
                 break;
-
             }
             case SpawnSide.Left:
             {
                 spawnPosX = - Constants.SpawnBoundX;
                 spawnPosY = Random.Range(-(Constants.CornerY - borderShiftY), Constants.CornerY - borderShiftY);
-                zRot = Random.Range(-180, 0);
                 break;
             }
             case SpawnSide.Right:
             {
                 spawnPosX = Constants.SpawnBoundX;
                 spawnPosY = Random.Range(-(Constants.CornerY - borderShiftY), Constants.CornerY - borderShiftY);
-                zRot = Random.Range(0, 180);
                 break;
             }
         }
@@ -137,9 +123,8 @@ public class SpawnManager : MonoBehaviour
         return new Vector3(spawnPosX, spawnPosY);
     }
 
-    private void SpawnAsteroidsAfterDestroy(object sender, EventArgs e)
+    private void SpawnAsteroidsAfterDestroy(GameObject asteroid)
     {
-        var asteroid = (GameObject)sender;
         AsteroidPool.Release(asteroid);
         if (asteroid.tag == Constants.SmallAsteroidTag)
         {
@@ -160,17 +145,16 @@ public class SpawnManager : MonoBehaviour
         }
     }
 
-    private void ReturnAsteroidToPool(object sender, EventArgs e)
+    private void ReturnAsteroidToPool(GameObject asteroid)
     {
-        var asteroid = (GameObject)sender;
         AsteroidPool.Release(asteroid);
         StartWaveIfAllDestroyed();
     }
 
-    private void ReturnUFOToPool(object sender, EventArgs e)
+    private void ReturnUFOToPool(GameObject sender)
     {
-        var ufo = (GameObject)sender;
-        UFOPool.Release(ufo);
+        UFOPool.Release(sender);
+        PlayASteroidExplosionSound(sender.tag);
         if (UFOPool.CountActive == 0)
         {
             StartCoroutine(StartSpawningUFO());
@@ -189,13 +173,14 @@ public class SpawnManager : MonoBehaviour
             actionOnGet: (obj) =>
             {
                 obj.transform.rotation = asteroidPrefab.transform.rotation;
-                AsteroidController.AsteroidCount++;
+                GameManager.AsteroidCount++;
                 obj.SetActive(true);
             },
             actionOnRelease: (obj) =>
             {
                 obj.SetActive(false);
-                AsteroidController.AsteroidCount--;
+                PlayASteroidExplosionSound(obj.tag);
+                GameManager.AsteroidCount--;
             },
             actionOnDestroy: (obj) => Destroy(obj),
             defaultCapacity: 10, collectionCheck: false,
@@ -224,7 +209,6 @@ public class SpawnManager : MonoBehaviour
     {
         var uFOspawnTime = Random.Range(UFOMinSpawnDelay, UFOMaxSpawnDelay);
         yield return new WaitForSeconds(uFOspawnTime);
-        Debug.Log("Spawn!!");
         SpawnUFO();
     }
 
@@ -238,7 +222,7 @@ public class SpawnManager : MonoBehaviour
     {
         if (AsteroidPool.CountActive == 0)
         {
-            StartCoroutine(WaitAndSpawnWave(spawnTime,null));
+            StartCoroutine(WaitAndSpawnWave(nextWaveSpawnTime,null));
         }
     }
 
@@ -246,5 +230,34 @@ public class SpawnManager : MonoBehaviour
     {
         AsteroidPool = null;
         UFOPool = null;
+    }
+
+    private void PlayASteroidExplosionSound(string asteroidTag)
+    {
+        audioSource.clip = GetClipByAsteroidTag(asteroidTag);
+        audioSource.Play();
+    }
+
+    private AudioClip GetClipByAsteroidTag(string asteroidTag)
+    {
+        switch (asteroidTag)
+        {
+            case Constants.SmallAsteroidTag:
+            {
+                return asteroidAudioClips[0]; 
+            }
+            case Constants.MediumAsteroidTag:
+            {
+                return asteroidAudioClips[1];
+            }
+            case Constants.BigAsteroidTag:
+            {
+                return asteroidAudioClips[2];
+            }
+            default:
+            {
+                return asteroidAudioClips[3];
+            }
+        }
     }
 }

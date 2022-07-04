@@ -7,9 +7,8 @@ public class AsteroidController : MonoBehaviour
     [SerializeField] private float minSpeed = 3;
     [SerializeField] private float maxSpeed = 6;
     [SerializeField] float fixedSpeed;
-    public static int AsteroidCount;
-    public static event EventHandler ReturnAndSpawnOther;
-    public static event EventHandler ReturnWithoutSpawn;
+    public static event Action<GameObject> ReturnAndSpawnOther;
+    public static event Action<GameObject> ReturnWithoutSpawn;
     private float currentSpeed;
     
     // Start is called before the first frame update
@@ -37,15 +36,14 @@ public class AsteroidController : MonoBehaviour
         }
         if (other.CompareTag(Constants.PlayerTag) || other.CompareTag(Constants.UFOTag))
         {
-            ReturnWithoutSpawn?.Invoke(this.gameObject, EventArgs.Empty);
+            ReturnWithoutSpawn?.Invoke(this.gameObject);
             return;
         }
-        ReturnAndSpawnOther?.Invoke(this.gameObject, EventArgs.Empty);
+        ReturnAndSpawnOther?.Invoke(this.gameObject);
     }
 
     private void ResetStaticOnDestroy()
     {
-        AsteroidCount = 0;
         ReturnAndSpawnOther = null;
         ReturnWithoutSpawn = null;
     }

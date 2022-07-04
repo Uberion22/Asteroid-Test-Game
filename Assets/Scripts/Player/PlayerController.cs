@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -12,15 +11,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float frictionForce = 0.001f;
     [SerializeField] private GameObject bullet;
     [SerializeField] private float shutPerSecond = 3;
+    [SerializeField] private Transform childTransform;
+    [SerializeField] AudioSource audioSource;
+    [SerializeField] AudioClip acceleartionClip;
 
     public static ObjectPool<GameObject> PlayerBulletPool;
-    public static event EventHandler PlayerDamaged;
+    public static event Action PlayerDamaged;
 
     private float currentSpeed;
     private float timeAfterShot;
     private int flickerTicks = 3;
     private float flickerSpeed = 0.5f;
-    private Transform childTransform;
+    
     private bool invulnerabilityEnabled;
     private Vector3 directionVector;
     private float speedModifer = 100;
@@ -28,23 +30,32 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        PlayerBullet.ReturnToPool += ReturnToBulletPool;
         SetBulletPoolSettings();
-        childTransform = gameObject.transform.Find("PlayerDetails");
+    }
+
+    void OnEnable()
+    {
+        PlayerBullet.ReturnToPlayerBulletPool += ReturnToBulletPool;
     }
 
     // Update is called once per frame
     void LateUpdate()
     {
+        if (Time.timeScale == 0) return;
+
+        if (Input.GetKeyUp(KeyCode.W))
+        {
+            audioSource.Stop();
+        }
+
         RotatePlayer();
         MovePlayer();
         TryShot();
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
-        PlayerBulletPool = null;
-        PlayerDamaged = null;
+        PlayerBullet.ReturnToPlayerBulletPool -= ReturnToBulletPool;
     }
 
     private void TryShot()
@@ -62,13 +73,13 @@ public class PlayerController : MonoBehaviour
     {
         if(invulnerabilityEnabled || other.CompareTag(Constants.PlayerBulletTag)) return;
 
-        PlayerDamaged?.Invoke(null, EventArgs.Empty);
+        PlayerDamaged?.Invoke();
         StartCoroutine(EnableFlicker());
     }
 
-    private void ReturnToBulletPool(object sender, EventArgs e)
+    private void ReturnToBulletPool(GameObject sender)
     {
-        var playerBullet = (GameObject)sender;
+        var playerBullet = sender;
         PlayerBulletPool.Release(playerBullet);
     }
 
@@ -77,7 +88,7 @@ public class PlayerController : MonoBehaviour
         return timeAfterShot >= 1.0f / shutPerSecond;
     }
     
-    private void SetActive()
+    private void EnableOrDisablePlayer()
     {
         childTransform.gameObject.SetActive(!childTransform.gameObject.activeSelf);
     }
@@ -88,7 +99,7 @@ public class PlayerController : MonoBehaviour
         invulnerabilityEnabled = true;
         while (currentTicks <= flickerTicks)
         {
-            SetActive();
+            EnableOrDisablePlayer();
             currentTicks += flickerSpeed;
             yield return new WaitForSeconds(flickerSpeed);
         }
@@ -115,6 +126,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.W))
         {
+            PlayAccelerationSound();
             currentSpeed = currentSpeed >= maxSpeed ? currentSpeed : currentSpeed + acceleration;
             directionVector = transform.up;
         }
@@ -137,5 +149,12 @@ public class PlayerController : MonoBehaviour
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, targetQuaternion, Time.deltaTime * (rotationSpeed / speedModifer));
         }
+    }
+
+    private void PlayAccelerationSound()
+    {
+        if(audioSource.isPlaying) return;
+        
+        audioSource.Play();
     }
 }

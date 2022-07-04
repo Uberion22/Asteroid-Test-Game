@@ -4,18 +4,25 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static bool IsNewGame = true;
-
     public static long Score;
     public static int Lives = 3;
-    public static event EventHandler UpdateScore;
-    public static event EventHandler UpdateLives;
+    public static int AsteroidCount;
+    public static event Action<long> UpdateScore;
+    public static event Action<int> UpdateLives;
     public static bool KeyboardOnly = true;
-    // Start is called before the first frame update
-    
-    void Start()
+
+    void OnEnable()
     {
+        AsteroidCount = 0;
+        Debug.Log(AsteroidCount);
         PlayerBullet.GetScorePoint += GetScorePoint;
         PlayerController.PlayerDamaged += HitPlayer;
+    }
+
+    void OnDisable()
+    {
+        PlayerBullet.GetScorePoint -= GetScorePoint;
+        PlayerController.PlayerDamaged -= HitPlayer;
     }
 
     void OnDestroy()
@@ -26,17 +33,16 @@ public class GameManager : MonoBehaviour
         UpdateLives = null;
     }
 
-    private void GetScorePoint(object enemyTag, EventArgs e)
+    private void GetScorePoint(string enemyTag)
     {
-        var enTag = (string)enemyTag;
-        Constants.DestroyScorePoints.TryGetValue(enTag, out var point);
+        Constants.DestroyScorePoints.TryGetValue(enemyTag, out var point);
         Score += point;
-        UpdateScore?.Invoke(Score, EventArgs.Empty);
+        UpdateScore?.Invoke(Score);
     }
 
-    private void HitPlayer(object enemyTag, EventArgs e)
+    private void HitPlayer()
     {
         Lives--;
-        UpdateLives?.Invoke(Lives, EventArgs.Empty);
+        UpdateLives?.Invoke(Lives);
     }
 }

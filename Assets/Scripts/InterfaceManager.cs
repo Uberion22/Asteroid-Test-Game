@@ -1,4 +1,3 @@
-using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -9,20 +8,29 @@ public class InterfaceManager : MonoBehaviour
     [SerializeField] GameObject continueBtn;
     [SerializeField] TMP_Text scoreText;
     [SerializeField] TMP_Text livesText;
-    [SerializeField] private TMP_Text settingsButtonText;
+    [SerializeField] TMP_Text settingsButtonText;
     private float currentTimeScale;
 
     // Start is called before the first frame update
     void Start()
     {
-        GameManager.UpdateScore += UpdateScorePoints;
-        GameManager.UpdateLives += UpdateLives;
         currentTimeScale = Time.timeScale;
         Time.timeScale = 0;
         ShowButtons(GameManager.IsNewGame);
         SetSettingsButtonText();
     }
 
+    void OnEnable()
+    {
+        GameManager.UpdateScore += UpdateScorePoints;
+        GameManager.UpdateLives += UpdateLives;
+    }
+
+    void OnDisable()
+    {
+        GameManager.UpdateScore -= UpdateScorePoints;
+        GameManager.UpdateLives -= UpdateLives;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -67,14 +75,14 @@ public class InterfaceManager : MonoBehaviour
         SetSettingsButtonText();
     }
 
-    private void UpdateScorePoints(object currentScore, EventArgs e)
+    private void UpdateScorePoints(long currentScore)
     {
         scoreText.text = $"Score: {currentScore}";
     }
 
-    private void UpdateLives(object currentLives, EventArgs e)
+    private void UpdateLives(int currentLives)
     {
-        if ((int) currentLives == 0)
+        if (currentLives == 0)
         {
             ShowButtons();
             continueBtn.SetActive(false);
