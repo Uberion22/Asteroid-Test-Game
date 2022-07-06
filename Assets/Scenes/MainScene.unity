@@ -508,9 +508,9 @@ RectTransform:
   m_Father: {fileID: 667855229}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 960, y: -540}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &329270027
@@ -680,10 +680,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   asteroidPrefab: {fileID: 4946958396658584071, guid: 1c466e97b9623464da8487af36fe4267, type: 3}
   UFOPrefab: {fileID: 1962409815259337456, guid: a090b29e528c84244a770b51795c4189, type: 3}
-  UFOMinSpawnDelay: 2
-  UFOMaxSpawnDelay: 8
+  UFOMinSpawnDelay: 20
+  UFOMaxSpawnDelay: 40
   nextWaveSpawnTime: 2
   enemysInWave: 2
+  asteroidSpawnAngle: 45
   audioSource: {fileID: 473044080}
   asteroidAudioClips:
   - {fileID: 8300000, guid: 8dd64161c8d49d742a386b976ebb8f11, type: 3}
@@ -1517,7 +1518,7 @@ MonoBehaviour:
   rotationSpeed: 100
   maxSpeed: 2
   acceleration: 0.02
-  frictionForce: 0.003
+  frictionForce: 0.0003
   bullet: {fileID: 5578940277461347107, guid: 7748a48a156f4574f985154d27add1da, type: 3}
   shutPerSecond: 3
   childTransform: {fileID: 1436015484}

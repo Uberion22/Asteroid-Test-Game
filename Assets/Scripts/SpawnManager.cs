@@ -12,6 +12,7 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] float UFOMaxSpawnDelay = 10;
     [SerializeField] float nextWaveSpawnTime = 2;
     [SerializeField] int enemysInWave = 2;
+    [SerializeField] float asteroidSpawnAngle = 45;
     [SerializeField] AudioSource audioSource;
     [SerializeField] AudioClip[] asteroidAudioClips;
     public static ObjectPool<GameObject> AsteroidPool;
@@ -136,7 +137,7 @@ public class SpawnManager : MonoBehaviour
         var currentSize = asteroid.tag == Constants.BigAsteroidTag ? AsteroidSize.MediumAsteroid : AsteroidSize.SmallAsteroid;
         for (var i = 0; i < 2; i++)
         {
-            var zRotation = i == 0 ? asteroid.transform.eulerAngles.z + 45 : asteroid.transform.eulerAngles.z - 45;
+            var zRotation = i == 0 ? asteroid.transform.eulerAngles.z + asteroidSpawnAngle : asteroid.transform.eulerAngles.z - asteroidSpawnAngle;
             var rotation = Quaternion.Euler(transform.rotation.x, transform.rotation.y, zRotation);
             var current = AsteroidPool.Get();
             current.transform.position = spawnPos;
