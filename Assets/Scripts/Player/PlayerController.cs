@@ -22,9 +22,10 @@ public class PlayerController : MonoBehaviour
     private float timeAfterShot;
     private int flickerTicks = 3;
     private float flickerSpeed = 0.5f;
-    
     private bool invulnerabilityEnabled;
     private Vector3 directionVector;
+    private Vector3 lastDirectionVector;
+    private Quaternion lastRotation;
     private float speedModifer = 100;
 
     // Start is called before the first frame update
@@ -128,8 +129,15 @@ public class PlayerController : MonoBehaviour
         {
             PlayAccelerationSound();
             currentSpeed = currentSpeed >= maxSpeed ? currentSpeed : currentSpeed + acceleration;
-            directionVector = transform.up;
+            directionVector = (transform.up.normalized + lastDirectionVector).normalized;
         }
+
+        if (transform.rotation != lastRotation)
+        {
+            lastRotation = transform.rotation;
+            lastDirectionVector = directionVector;
+        }
+
         currentSpeed = currentSpeed <= 0 ? 0 : currentSpeed - frictionForce;
         transform.position += directionVector * Time.deltaTime * currentSpeed;
     }
